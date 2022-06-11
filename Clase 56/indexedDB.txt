@@ -59,3 +59,20 @@ request.onsuccess = function(event) {
   db = request.result;
 };
 
+En este caso, la base de datos ya tendrá los almacenes de objetos de la versión anterior de la base de datos, por lo que no tiene que crear estos almacenes de objetos de nuevo. Sólo es necesario crear nuevos almacenes de objetos, o eliminar las tiendas de objetos de la versión anterior que ya no son necesarios. Si necesita cambiar un almacén de objetos existentes (por ejemplo, para cambiar la ruta de acceso clave keyPath), entonces se debe eliminar el antiguo almacén de objetos y crear de nuevo con las nuevas opciones. (Tenga en cuenta que esto borrará la información en el almacén de objetos Si usted necesita guardar esa información, usted debe leerlo y guardarlo en otro lugar antes de actualizar la base de datos.)
+
+Tratar de crear un almacén de objetos con un nombre que ya existe (o tratando de eliminar un almacén de objetos con un nombre que no existe) lanzará un error.
+
+Si el evento onupgradeneeded retorna éxito, entonces se activará el manejador onsuccess de la solicitud de base de datos abierta.
+
+
+
+Estructuración de la base de datos
+Ahora para estructurar la base de datos. IndexedDB usa almacenes de datos (object stores) en lugar de tablas, y una base de datos puede contener cualquier número de almacenes. Cuando un valor es almacenado, se le asocia con una clave. Existen diversas maneras en que una clave pude ser indicada dependiendo de si el almacén usa una ruta de clave o generador.
+
+
+
+
+
+También se puede crear índices en cualquer almacén de objetos, siempre y cuando el almacén contenga objets, y no primitivos. Un índice permite buscar valores contenidos en el almacén usando el valor de una propiedad del objeto almacenado, en lugar de la clave del mismo.
+
