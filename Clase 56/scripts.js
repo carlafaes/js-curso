@@ -55,6 +55,7 @@ if (indexedDB && form) {
                 cursor.continue()//se agrega continue,para que no detenga la ejecucion luego del primer registro, sino que lea todos
             }
             else{
+                tasks.textContent= ''
                 tasks.appendChild(fragment)
             }
         }
