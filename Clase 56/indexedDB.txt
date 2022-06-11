@@ -1,0 +1,61 @@
+Patrones Básicos
+El patrón básico que indexedDB propone es:
+
+Abrir una base de datos.
+Crear un objeto de almacenamiento en la base de datos.
+Iniciar una transacción y hacer una petición para hacer alguna operación de la base de datos, tal como añadir o recuperar datos.
+Espere a que se complete la operación por la escucha de la clase correcta de eventos DOM .
+Hacer algo con el resultado (El cual puede ser encontrado en el objeto de la petición).
+Con esos grandes rasgos en mente, seremos más concretos.
+
+Creando y estructurando el almacenamiento
+Como las especificaciones están todavía elaborandose, las implementaciones actuales de indexedDB dependen de los navegadores. Hasta que la especificación se haya consolidado, los proveedores de navegadores pueden tener diferentes implementaciones de los estandares de indexedDB. Una vez se alcance el consenso en el estandar, los proveedores implementarán la API sin prefijos. En algunas implementaciones ya fueron removidos los prefijos: Internet Explorer 10, Firefox 16, Chrome 24. Cuando utilizan un prefijo, los navegadores basados en gecko usan el prefijo moz , mientras que los navegadores basados en WebKit usan el prefijo webkit.
+
+Hay que tener cuidado con las implementaciones que usan un prefijo ya que puede ser inestables, incompletas, o usen una versión antigua de la especificación. En producción se recomienda usar el código sin prefijos. Es preferible no tener soporte para un navegador a decir que lo tiene y fallar en ello :
+
+if (!window.indexedDB) {
+    window.alert("Su navegador no soporta una versión estable de indexedDB. Tal y como las características no serán validas");
+}
+
+Abriendo una base de datos
+Iniciamos todo el proceso así:
+
+// dejamos abierta nuestra base de datos
+var request = window.indexedDB.open("MyTestDatabase", 3);
+Copy to Clipboard
+¿Lo has visto? Abrir una base de datos es igual que cualquier otra operación — solo tienes que "solicitarla" (request).
+
+La solicitud de apertura no abre la base de datos o inicia la transacción de inmediato. La llamada a la función open() retornan unos objetos IDBOpenDBRequest, cuyo resultado, correcto o erróneo, se maneja en un evento.  Alguna otra función asincrónica en indexedDB hace lo mismo - Devolver un objeto IDBRequest que disparará un evento con el resultado o el error. El resultado para la función de abrir es una instancia de un IDBDatabase.
+
+El segundo parámetro para el método open es la versión de la base de datos. La versión de la base de datos determina el esquema - El almacen de objectos en la base de datos y su estructura. Si la base de datos no existe, es creada y se dispara un evento onupgradeneeded de inmediato, permitiéndote proveer una actualización de la estructura e índices en la función que capture dicho evento. 
+
+Importante: El número de versión es un unsigned long. Por lo tanto significa que puede ser un entero muy grande. También significa que si usas un flotante será convertido en un entero más cercano y la transacción puede no ser iniciada, el evento upgradeneeded no se desencadenará. Por ejemplo no use 2.4 como un número de versión ya que será igual que la 2:
+
+var request = indexedDB.open("MyTestDatabase", 2.4); // Esto no se hace, la versión será redondeada a 2
+
+
+Generando manipuladores
+La primera cosa que usted querrá hacer con la totalidad de las peticiones que usted genera es agregar controladores de éxito y de error:
+
+request.onerror = function(event) {
+  // Hacer algo con request.errorCode!
+};
+request.onsuccess = function(event) {
+  // Hacer algo con request.result!
+};
+
+La API IndexedDB está diseñada para minimizar la necesidad de control de errores, por lo que no es probable que veamos muchos eventos de error (al menos, no una vez que estás acostumbrado a la API). En el caso de la apertura de una base de datos, sin embargo, hay algunas condiciones comunes que generan eventos de error. El problema más común se produce cuando el usuario ha decidido no dar, a su aplicación web, el permiso para crear una base de datos. Uno de los principales objetivos de diseño de IndexedDB es permitir que grandes cantidades de datos se almacenen para su uso sin conexión a internet. (Para obtener más información sobre la cantidad de almacenamiento que puede tener para cada navegador, consulte Límites de almacenamiento.)  
+
+Obviamente, los navegadores no permitirán que alguna red de publicidad o sitio web malicioso pueda contaminar su ordenador, por ello los navegadores utilizan un diálogo para indicar al usuario la primera vez que cualquier aplicación web determinada intente abrir una IndexedDB para el almacenamiento. El usuario puede optar por permitir o denegar el acceso. Además, el almacenamiento IndexedDB en los modos de privacidad navegadores sólo dura en memoria hasta que la sesión de incógnito haya sido cerrada.
+
+Ahora, asumiendo que el usuario acepta su solicitud para crear una base de datos, y que ha recibido un evento de éxito para activar la devolución de llamada de éxito; ¿Que sigue? La solicitud aquí se generó con una llamada a indexedDB.open (), por lo request.result es una instancia de IDBDatabase, y que sin duda quieren ahorrar para más adelante. Su código podría ser algo como esto:
+
+var db;
+var request = indexedDB.open("MyTestDatabase");
+request.onerror = function(event) {
+  alert("Why didn't you allow my web app to use IndexedDB?!");
+};
+request.onsuccess = function(event) {
+  db = request.result;
+};
+
