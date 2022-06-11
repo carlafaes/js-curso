@@ -14,6 +14,7 @@ if (indexedDB && form) {
     request.onsuccess = () => {
         db = request.result
         console.log('OPEN', db)
+        readData();
     }
 
     request.onupgradeneeded = (e) => {
@@ -33,6 +34,16 @@ if (indexedDB && form) {
         const transaction = db.transaction(['tasks'], 'readwrite')//puede ser readonly o readwrite
         const objectStore = transaction.objectStore('tasks')
         const request = objectStore.add(data)
+    }
+
+    const readData= ()=>{
+        const transaction= db.transaction(['tasks'], 'readonly')
+        const objectStore= transaction.objectStore('tasks')
+        const request= objectStore.openCursor()// metodo que permite leer los registros y devolvernos su contenido
+
+        request.onsuccess= (e)=>{
+            console.log(e.target)
+        }
     }
 
     form.addEventListener('submit', (e) => {
