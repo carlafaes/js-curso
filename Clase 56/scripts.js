@@ -34,18 +34,28 @@ if (indexedDB && form) {
         const transaction = db.transaction(['tasks'], 'readwrite')//puede ser readonly o readwrite
         const objectStore = transaction.objectStore('tasks')
         const request = objectStore.add(data)
+        readData()
     }
 
     const readData= ()=>{
         const transaction= db.transaction(['tasks'], 'readonly')
         const objectStore= transaction.objectStore('tasks')
         const request= objectStore.openCursor()// metodo que permite leer los registros y devolvernos su contenido
+        const fragment= document.createDocumentFragment()
 
         request.onsuccess= (e)=>{
             const cursor= e.target.result;
             if(cursor){//consulta si existe,para leer los registros solo si existen
-                console.log(cursor.value)
+                const taskTitle = document.createElement('P')
+                taskTitle.textContent= cursor.value.taskTitle
+                fragment.appendChild(taskTitle)
+                const taskPriority= document.createElement('P')
+                taskPriority.textContent = cursor.value.taskPriority
+                fragment.appendChild(taskPriority)
                 cursor.continue()//se agrega continue,para que no detenga la ejecucion luego del primer registro, sino que lea todos
+            }
+            else{
+                tasks.appendChild(fragment)
             }
         }
     }
