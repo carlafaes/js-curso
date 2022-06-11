@@ -21,7 +21,8 @@ if (indexedDB && form) {
         console.log('Create', db)
         const objectStore = db.createObjectStore('tasks', {
             autoIncrement: true
-        })
+            // keyPath:'clave_unica' //la key seria la que asignamos con keyPath
+        })//autoincrement es la key que recibira, que ira aumentando uno en uno cada vez que haya un nuevo dato
     }
 
     request.onerror = (error) => {

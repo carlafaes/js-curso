@@ -70,7 +70,7 @@ Si el evento onupgradeneeded retorna éxito, entonces se activará el manejador 
 Estructuración de la base de datos
 Ahora para estructurar la base de datos. IndexedDB usa almacenes de datos (object stores) en lugar de tablas, y una base de datos puede contener cualquier número de almacenes. Cuando un valor es almacenado, se le asocia con una clave. Existen diversas maneras en que una clave pude ser indicada dependiendo de si el almacén usa una ruta de clave o generador.
 
-
+//Ver tabla cargada en el archivos img.
 
 
 
