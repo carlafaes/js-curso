@@ -42,7 +42,11 @@ if (indexedDB && form) {
         const request= objectStore.openCursor()// metodo que permite leer los registros y devolvernos su contenido
 
         request.onsuccess= (e)=>{
-            console.log(e.target)
+            const cursor= e.target.result;
+            if(cursor){//consulta si existe,para leer los registros solo si existen
+                console.log(cursor.value)
+                cursor.continue()//se agrega continue,para que no detenga la ejecucion luego del primer registro, sino que lea todos
+            }
         }
     }
 
