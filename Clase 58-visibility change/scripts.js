@@ -49,7 +49,7 @@ if (indexedDB && form) {
     const updateData = (data) => {
         const transaction = db.transaction(['tasks'], 'readwrite')
         const objectStore = transaction.objectStore('tasks')
-        const request = objectStore.put(data)
+        const request = objectStore.put(data)//si el dato existe lo actualiza 
         request.onsuccess = () => {
             form.button.dataset.action = 'add'
             form.button.textContent = 'Add Task'
